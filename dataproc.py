@@ -10,3 +10,4 @@ data = cursor.fetchall()
 print(data)
 random.shuffle(data)
 print(data)
+
