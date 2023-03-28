@@ -7,7 +7,7 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 
 import numpy as np
 import pandas as pd
-from calattr import *
+from _calattr import *
 
 
 class QLearningTable:

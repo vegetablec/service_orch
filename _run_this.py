@@ -50,9 +50,9 @@ def update():
             # RL take action and get next observation and reward
             state_, reward, done = RL.step(state, action)
 
-            # print("s = {0}, a = {1}, s_ = {2}, reward = {3}".format(
-            #     state, action, state_, reward
-            # ))
+            print("s = {0}, a = {1}, s_ = {2}, reward = {3}".format(
+                state, action, state_, reward
+            ))
 
             # RL learn from this transition
             RL.learn(state, action, reward, state_)
