@@ -7,7 +7,7 @@ def getdata():
   sql = 'select id,RT,Avai,Thr,Succ,Reli,Name from qws2;'
   cursor.execute(sql)
   data = cursor.fetchall()
-  nodeSet_file = "./nodeSet.txt"
+  nodeSet_file = "nodeSet.txt"
   # print(len(list(data)))
   fd = open(nodeSet_file, 'r')
   nodeSets = fd.readlines()[1]  # str

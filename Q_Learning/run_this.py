@@ -1,4 +1,5 @@
 from RL_brain import QLearningTable
+from read_nodeSet import readNodeSet
 import time
 
 # 超参数配置
@@ -7,7 +8,7 @@ outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.60  # e_greedy
-MAX_EPISODES = 3000  # 最大迭代轮数
+MAX_EPISODES = 5000  # 最大迭代轮数
 ERROR_COUNT = 50   # 连续100次，reward变化在误差允许范围内，则提前终止实验
 ERROR_RANGE = 0.0001   # 误差范围
 judge_list = []
@@ -32,9 +33,9 @@ def update():
             # 进行选择并计算奖励
             state_, reward, done = RL.step(state, action)
 
-            print("s = {0}, a = {1}, s_ = {2}, reward = {3}".format(
-                state, action, state_, reward
-            ))
+            # print("s = {0}, a = {1}, s_ = {2}, reward = {3}, done = {4}".format(
+            #     state, action, state_, reward, done
+            # ))
 
             # 更新Q表
             RL.learn(state, action, reward, state_)
@@ -51,6 +52,7 @@ def update():
                 else:
                     if reward > max_reward:
                         max_reward = reward
+                        print("test reward")
                         print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
                               (RL.choose_services, reward, time.time() - start, episode))
                     else:
@@ -80,12 +82,12 @@ def update():
                 # fp.close()
                 break
 
-    print('game over')
+    print("game over, runtime ={} ".format(time.time() - start))
 
 
 if __name__ == "__main__":
 
-    nodes_num, each_services_nums, all_services_nums, max_services_num = cal_num(nodeSet)
+    nodes_num, each_services_nums, all_services_nums, max_services_num = readNodeSet(nodeSet)
     print("1.服务节点数：{}".format(nodes_num))
     print("2.每个节点处候选子集大小：{}".format(each_services_nums))
     print("3.总的候选原子个数：{}".format(all_services_nums))

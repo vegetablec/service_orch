@@ -1,7 +1,7 @@
 
 
 def readNodeSet(nodeSet):
-    fd = open(nodeSet_file, 'r')
+    fd = open(nodeSet, 'r')
     nodeSets = fd.readlines()[1]  # str
     nodeSets = nodeSets.split(' ')  # list
     each_services_num = []
