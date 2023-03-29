@@ -1,12 +1,26 @@
 import pymysql
-import random
+# 全数据为2507
 
-conn = pymysql.connect(host='42.193.113.93', user='root', password='291482jX', db='qws')
-cursor = conn.cursor()
-sql = 'select id,RT,Avai,Thr,Succ,Name from qws2;'
-cursor.execute(sql)
-data = cursor.fetchall()
-nodedata = []
-for i in range(0,10):
-  nodedata.append(random.sample(data, random.randint(1, 1000)))
+def getdata():
+  conn = pymysql.connect(host='42.193.113.93', user='root', password='291482jX', db='qws')
+  cursor = conn.cursor()
+  sql = 'select id,RT,Avai,Thr,Succ,Reli,Name from qws2;'
+  cursor.execute(sql)
+  data = cursor.fetchall()
+  nodeSet_file = "./nodeSet.txt"
+  # print(len(list(data)))
+  fd = open(nodeSet_file, 'r')
+  nodeSets = fd.readlines()[1]  # str
+  nodeSets = nodeSets.split(' ')  # list
+  # print(nodeSets)
+  nodedata = []
+  for i in range(0, 10):
+    nodedata.append([])
+    _num = int(nodeSets[i])
+    for num in range(_num):
+      nodedata[i].append(data[_num % 2507])
+      _num += _num
+
+  return nodedata
+
 
