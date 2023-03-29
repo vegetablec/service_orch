@@ -94,7 +94,7 @@ def get_min_reli():
 
     return min
 
-def receive(service):
+def receive(state, action):
     maxTime = get_max_rt()
     minTime = get_min_rt()
     maxAvail = get_max_avai()
@@ -105,7 +105,7 @@ def receive(service):
     minSucc = get_min_succ()
     maxThrou = get_max_thr()
     minThrou = get_min_thr()
-    r = service
+    r = service_data[state][action]
     f1 = ((r[1] - minTime) / (maxTime - minTime))+ \
         (-(r[2] - minAvail) / (maxAvail - minAvail))+ \
         (-(r[3] - minThrou) / (maxThrou - minThrou))+ \

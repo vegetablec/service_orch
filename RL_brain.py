@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from getscore import receive
 
 class QLearningTable:
     def __init__(self, n_states, each_services_nums, max_services_num, learning_rate, reward_decay,
@@ -48,8 +49,8 @@ class QLearningTable:
         if s == self.n_states - 1:
             done = True
             s_ = -1
-            # TODO 计算Qos评价
-            f = 0
+            # 计算Qos评分
+            f = receive(s, a)  # 传state和action
             reward = f
         # 此状态不为终状态
         else:
