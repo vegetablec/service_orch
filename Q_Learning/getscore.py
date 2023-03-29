@@ -113,3 +113,10 @@ def receive(state, action):
         (-(r[5] - minReli) / (maxReli - minReli))
     f = -1.0 / 6 * f1
     return f
+
+def get_id_list(action_list):
+    id_list = []
+    for i in range(len(action_list)):
+        id_list.append([service_data[i][action_list[i]][0], service_data[i][action_list[i]][6]])
+
+    return id_list

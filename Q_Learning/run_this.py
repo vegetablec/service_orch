@@ -1,5 +1,6 @@
 from RL_brain import QLearningTable
 from read_nodeSet import readNodeSet
+from getscore import get_id_list
 import time
 
 # 超参数配置
@@ -8,8 +9,8 @@ outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.60  # e_greedy
-MAX_EPISODES = 5000  # 最大迭代轮数
-ERROR_COUNT = 50   # 连续100次，reward变化在误差允许范围内，则提前终止实验
+MAX_EPISODES = 1000  # 最大迭代轮数
+ERROR_COUNT = 100   # 连续100次，reward变化在误差允许范围内，则提前终止实验
 ERROR_RANGE = 0.0001   # 误差范围
 judge_list = []
 
@@ -45,6 +46,7 @@ def update():
 
             # 本轮迭代结束跳出
             if done:
+
                 # print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
                 #       (RL.choose_services, reward, time.time()-start, episode))
                 if episode == 0:
@@ -52,12 +54,11 @@ def update():
                 else:
                     if reward > max_reward:
                         max_reward = reward
-                        print("test reward")
                         print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
-                              (RL.choose_services, reward, time.time() - start, episode))
+                              (get_id_list(RL.choose_services), reward, time.time() - start, episode))
                     else:
                         if episode % 100 == 0:
-                            print("episode = {}".format(episode))
+                            print("episode = {0}, reward = {1}".format(episode, reward))
                 break
 
         # 终止条件

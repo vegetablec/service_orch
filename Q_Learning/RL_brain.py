@@ -3,6 +3,7 @@ import pandas as pd
 
 from Q_Learning.getscore import receive
 
+
 class QLearningTable:
     def __init__(self, n_states, each_services_nums, max_services_num, learning_rate, reward_decay,
                  e_greedy, e_greedy_increment=0.01):
