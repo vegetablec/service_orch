@@ -8,8 +8,8 @@ nodeSet = "./nodeSet.txt"
 outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
-EPSILON = 0.60  # e_greedy
-MAX_EPISODES = 1000  # 最大迭代轮数
+EPSILON = 0.90  # e_greedy
+MAX_EPISODES = 3000  # 最大迭代轮数
 ERROR_COUNT = 100   # 连续100次，reward变化在误差允许范围内，则提前终止实验
 ERROR_RANGE = 0.0001   # 误差范围
 judge_list = []
@@ -55,7 +55,7 @@ def update():
                     if reward > max_reward:
                         max_reward = reward
                         print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
-                              (get_id_list(RL.choose_services), reward, time.time() - start, episode))
+                              (RL.choose_services, reward, time.time() - start, episode))
                     else:
                         if episode % 100 == 0:
                             print("episode = {0}, reward = {1}".format(episode, reward))

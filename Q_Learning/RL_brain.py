@@ -45,13 +45,17 @@ class QLearningTable:
             q_target = r
         self.q_table.loc[s, a] += self.lr * (q_target - q_predict)
 
+        self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
+
     def step(self, s, a):  # 根据选择行为计算reward
         # 此状态为终状态
         if s == self.n_states - 1:
             done = True
             s_ = -1
+            f = 0
             # 计算Qos评分
-            f = receive(s, a)  # 传state和action
+            for i in range(len(self.choose_services)):
+                f += receive(i, self.choose_services[i])  # 传state和action
             reward = f
         # 此状态不为终状态
         else:
