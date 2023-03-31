@@ -99,7 +99,7 @@ class StepCal:
 
     def receive(self, state, action):
         # 如果为无效行为
-        if action > len(self.service_data[state]):
+        if action >= len(self.service_data[state]):
             return -10000
 
         maxTime = self.get_max_rt()
@@ -118,16 +118,19 @@ class StepCal:
             ((maxThrou - r[3]) / (maxThrou - minThrou))+ \
             ((maxSucc - r[4]) / (maxSucc - minSucc))+ \
             ((maxReli - r[5]) / (maxReli - minReli))
-        f = -1.0 / 6 * f1
+        f = 1.0 / 6 * f1
         return f
 
-    def step(self, s, a):  # 根据选择行为计算reward
+    def step(self, s, actions):  # 根据选择行为计算reward
         # 此状态为终状态
         if s == self.n_states - 1:
             done = True
             s_ = -1
+            f = 0
             # 计算Qos评分
-            f = self.receive(s, a)  # 传state和action
+            for state in range(len(actions)):
+                # print(state, actions[state])
+                f += self.receive(state, actions[state])  # 传state和action
             reward = f
         # 此状态不为终状态
         else:

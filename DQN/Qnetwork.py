@@ -6,7 +6,8 @@ import pandas as pd
 import numpy as np
 
 class DQnetwork:
-    def __init__(self, n_actions, n_features, epsilon, batch_size, learning_rate, gamma, replace_time, n_experience_pool):
+    def __init__(self, max_actions,  n_actions, n_features, epsilon, batch_size, learning_rate, gamma, replace_time, n_experience_pool):
+        self.max_actions = max_actions
         self.n_actions = n_actions
         self.n_features = n_features
         self.batch_size = batch_size
@@ -33,32 +34,37 @@ class DQnetwork:
         return keras.losses.mse(y_true, y_pred)
 
     def choose_action(self, s):
+        state = s
         s = np.array(s)
         s = s.reshape(1, 1)
         rand = np.random.rand(0, 1)
 
         if rand < self.epsilon:
-            self.epsilon = self.epsilon * 0.999999
-            return np.random.randint((0, self.n_actions))
+            self.epsilon = self.epsilon * 0.99999
+            return np.random.randint(0, self.max_actions)
+            # return np.random.randint(0, self.n_actions[state[0]])
 
         else:
             action_value = self.q_pred.predict(np.array(s))
             return np.argmax(action_value)
+            # return np.argmax(action_value[:, 0:(self.n_actions[state[0]])])
 
     def net_init(self):
         # q_pred
         input_features = tf.keras.Input(shape=(self.n_features,), name='input_features')
         dense_0 = tf.keras.layers.Dense(32, activation='relu')(input_features)
         dense_1 = tf.keras.layers.Dense(64, activation='relu')(dense_0)
-        dense_2 = tf.keras.layers.Dense(32, activation='relu')(dense_1)
-        out_put = tf.keras.layers.Dense(self.n_actions, name='prediction_q_pred')(dense_2)
+        dense_1_2 =  tf.keras.layers.Dense(128, activation='relu')(dense_1)
+        dense_1_1 = tf.keras.layers.Dense(256, activation='relu')(dense_1_2)
+        out_put = tf.keras.layers.Dense(self.max_actions, name='prediction_q_pred')(dense_1_1)
         self.q_pred = tf.keras.Model(inputs=input_features, outputs=out_put)
         # q_target
         input_features_target = tf.keras.Input(shape=(self.n_features,), name='input_features_target')
         dense_0_target = tf.keras.layers.Dense(32, activation='relu')(input_features_target)
         dense_1_target = tf.keras.layers.Dense(64, activation='relu')(dense_0_target)
-        dense_2_target = tf.keras.layers.Dense(32, activation='relu')(dense_1_target)
-        out_put_target = tf.keras.layers.Dense(self.n_actions, name='prediction_q_target')(dense_2_target)
+        dense_1_2_target = tf.keras.layers.Dense(128, activation='relu')(dense_1_target)
+        dense_1_1_target = tf.keras.layers.Dense(256, activation='relu')(dense_1_2_target)
+        out_put_target = tf.keras.layers.Dense(self.max_actions, name='prediction_q_target')(dense_1_1_target)
         self.q_target = tf.keras.Model(inputs=input_features_target, outputs=out_put_target)
 
         self.q_target.set_weights(self.q_pred.get_weights())

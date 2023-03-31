@@ -9,14 +9,14 @@ outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
-MAX_EPISODES = 500  # 最大迭代轮数
-EXPERIENCE_POOL = 300 # 经验池大小
+MAX_EPISODES = 3000  # 最大迭代轮数
+EXPERIENCE_POOL = 1000 # 经验池大小
 BATCH_SIZE = 64 # batch_size
 REPLACE_TIME=300 # replace_time
 
-def DQN_run(n_actions, n_features, node_num):
+def DQN_run(max_actions, n_actions, n_features, node_num):
     start = time.time()
-    DQN_agent = DQnetwork(n_actions=n_actions, n_features=n_features,
+    DQN_agent = DQnetwork(max_actions=max_actions, n_actions=n_actions, n_features=n_features,
                           epsilon=EPSILON, batch_size=BATCH_SIZE,
                           learning_rate=ALPHA, gamma=GAMMA, replace_time=REPLACE_TIME,
                           n_experience_pool=EXPERIENCE_POOL)
@@ -31,8 +31,8 @@ def DQN_run(n_actions, n_features, node_num):
             #print(state)
             action = DQN_agent.choose_action([state])
             choosen_actions.append(action)
-            print(state, action)
-            state_, reward, done = StepCalculater.step(state, action)
+            # print(state, action)
+            state_, reward, done = StepCalculater.step(state, choosen_actions)
             DQN_agent.experience_store(s=[state], a=action, r=reward, s_=[state_], done=done)
             DQN_agent.learn()
             state = state_
@@ -63,6 +63,6 @@ if __name__ == "__main__":
     print("3.总的候选原子个数：{}".format(all_services_nums))
     print("4.最大候选子集个数：{}".format(max_services_num))
 
-    DQN_run(max_services_num, 1, nodes_num)
+    DQN_run(max_services_num, each_services_nums, 1, nodes_num)
 
 
