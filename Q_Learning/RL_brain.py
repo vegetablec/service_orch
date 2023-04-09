@@ -6,7 +6,7 @@ from Q_Learning.getscore import receive
 
 class QLearningTable:
     def __init__(self, n_states, each_services_nums, max_services_num, learning_rate, reward_decay,
-                 e_greedy, e_greedy_increment=0.01):
+                 e_greedy, e_greedy_increment=0.00001):
         self.each_services_nums = each_services_nums
         self.n_actions = max_services_num
         self.n_states = n_states
@@ -26,7 +26,8 @@ class QLearningTable:
     def choose_action(self, state):  # 选择动作
         state_action = self.q_table.loc[state, :self.each_services_nums[state]]  # 取Q表中有效部分切片
         # 选择随机行为
-        if (np.random.uniform() > self.epsilon) or ((state_action == 0).all()):
+        if (np.random.rand() > self.epsilon) or ((state_action == 0).all()):
+            # print(self.epsilon)
             action = np.random.choice(list(range(self.each_services_nums[state])))
 
         # 选择最大价值行为，相同价值行为随机选择

@@ -1,18 +1,24 @@
+import numpy as np
+
 from RL_brain import QLearningTable
 from read_nodeSet import readNodeSet
 from getscore import get_id_list
 import time
+import matplotlib.pyplot as plt
+
 
 # 超参数配置
 nodeSet = "./nodeSet.txt"
 outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
-EPSILON = 0.90  # e_greedy
-MAX_EPISODES = 3000  # 最大迭代轮数
+EPSILON = 0.9  # e_greedy
+MAX_EPISODES = 50000  # 最大迭代轮数
 ERROR_COUNT = 100   # 连续100次，reward变化在误差允许范围内，则提前终止实验
 ERROR_RANGE = 0.0001   # 误差范围
 judge_list = []
+y = []
+x = np.arange(0, MAX_EPISODES)
 
 
 def update():
@@ -49,8 +55,11 @@ def update():
 
                 # print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
                 #       (RL.choose_services, reward, time.time()-start, episode))
+                y.append(reward)
                 if episode == 0:
                     max_reward = reward
+                    print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
+                          (RL.choose_services, reward, time.time() - start, episode))
                 else:
                     if reward > max_reward:
                         max_reward = reward
@@ -95,3 +104,6 @@ if __name__ == "__main__":
     print("4.最大候选子集个数：{}".format(max_services_num))
 
     update()
+    y = np.array(y)
+    plt.scatter(x, y)
+    plt.show()

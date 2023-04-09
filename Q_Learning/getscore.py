@@ -106,12 +106,12 @@ def receive(state, action):
     maxThrou = get_max_thr()
     minThrou = get_min_thr()
     r = service_data[state][action]
-    f1 = ((r[1] - minTime) / (maxTime - minTime))+ \
-        (-(r[2] - minAvail) / (maxAvail - minAvail))+ \
-        (-(r[3] - minThrou) / (maxThrou - minThrou))+ \
-        (-(r[4] - minSucc) / (maxSucc - minSucc))+ \
-        (-(r[5] - minReli) / (maxReli - minReli))
-    f = -1.0 / 6 * f1
+    f1 = ((r[1] - minTime) / (maxTime - minTime)) + \
+         ((maxAvail - r[2]) / (maxAvail - minAvail)) + \
+         ((maxThrou - r[3]) / (maxThrou - minThrou)) + \
+         ((maxSucc - r[4]) / (maxSucc - minSucc)) + \
+         ((maxReli - r[5]) / (maxReli - minReli))
+    f = 1.0 / 5 * f1
     return f
 
 def get_id_list(action_list):

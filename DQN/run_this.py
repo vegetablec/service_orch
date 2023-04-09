@@ -1,7 +1,11 @@
+import numpy as np
+
 from Qnetwork import DQnetwork
 from calStep import StepCal
 from read_nodeSet import readNodeSet
 import time
+import matplotlib.pyplot as plt
+
 
 # 超参数配置
 nodeSet = "./nodeSet.txt"
@@ -9,10 +13,19 @@ outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
-MAX_EPISODES = 3000  # 最大迭代轮数
-EXPERIENCE_POOL = 1000 # 经验池大小
+MAX_EPISODES = 1000  # 最大迭代轮数
+EXPERIENCE_POOL = 500 # 经验池大小
 BATCH_SIZE = 64 # batch_size
 REPLACE_TIME=300 # replace_time
+y = []
+x = np.arange(0,MAX_EPISODES)
+env = []
+def get_env(services_data):
+    for i in range(10):
+        tmp = []
+        for qos_data in services_data[i]:
+            tmp.append(qos_data[1:6])
+        env.append(tmp)
 
 def DQN_run(max_actions, n_actions, n_features, node_num):
     start = time.time()
@@ -21,7 +34,7 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
                           learning_rate=ALPHA, gamma=GAMMA, replace_time=REPLACE_TIME,
                           n_experience_pool=EXPERIENCE_POOL)
     StepCalculater = StepCal(node_num)
-    DQN_agent.net_init()
+    DQN_agent.net_init_LSTM()
     max_reward = 0
     for episode in range(MAX_EPISODES):
         # 初始化
@@ -29,6 +42,7 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
         choosen_actions = []
         while True:
             #print(state)
+            # get_env(StepCalculater.service_data)
             action = DQN_agent.choose_action([state])
             choosen_actions.append(action)
             # print(state, action)
@@ -38,6 +52,9 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
             state = state_
 
             if done:
+                # print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
+                #       (choosen_actions, reward, time.time() - start, episode))
+                y.append(reward)
                 if episode == 0:
                     max_reward = reward
                 else:
@@ -64,5 +81,8 @@ if __name__ == "__main__":
     print("4.最大候选子集个数：{}".format(max_services_num))
 
     DQN_run(max_services_num, each_services_nums, 1, nodes_num)
+    x = np.array(x)
+    plt.scatter(x, y)
+    plt.show()
 
 

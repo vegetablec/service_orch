@@ -37,12 +37,13 @@ class DQnetwork:
         state = s
         s = np.array(s)
         s = s.reshape(1, 1)
-        rand = np.random.rand(0, 1)
+        rand = np.random.rand()
+
 
         if rand < self.epsilon:
             self.epsilon = self.epsilon * 0.99999
-            return np.random.randint(0, self.max_actions)
-            # return np.random.randint(0, self.n_actions[state[0]])
+            # return np.random.randint(0, self.max_actions)
+            return np.random.randint(0, self.n_actions[state[0]])
 
         else:
             action_value = self.q_pred.predict(np.array(s))
@@ -51,20 +52,37 @@ class DQnetwork:
 
     def net_init(self):
         # q_pred
-        input_features = tf.keras.Input(shape=(self.n_features,), name='input_features')
+        input_features = tf.keras.Input(shape=(self.n_features), name='input_features')
         dense_0 = tf.keras.layers.Dense(32, activation='relu')(input_features)
         dense_1 = tf.keras.layers.Dense(64, activation='relu')(dense_0)
         dense_1_2 =  tf.keras.layers.Dense(128, activation='relu')(dense_1)
         dense_1_1 = tf.keras.layers.Dense(256, activation='relu')(dense_1_2)
-        out_put = tf.keras.layers.Dense(self.max_actions, name='prediction_q_pred')(dense_1_1)
+        out_put = tf.keras.layers.Dense(self.max_actions, activation='softmax', name='prediction_q_pred')(dense_1_1)
         self.q_pred = tf.keras.Model(inputs=input_features, outputs=out_put)
         # q_target
-        input_features_target = tf.keras.Input(shape=(self.n_features,), name='input_features_target')
+        input_features_target = tf.keras.Input(shape=(self.n_features), name='input_features_target')
         dense_0_target = tf.keras.layers.Dense(32, activation='relu')(input_features_target)
         dense_1_target = tf.keras.layers.Dense(64, activation='relu')(dense_0_target)
         dense_1_2_target = tf.keras.layers.Dense(128, activation='relu')(dense_1_target)
         dense_1_1_target = tf.keras.layers.Dense(256, activation='relu')(dense_1_2_target)
-        out_put_target = tf.keras.layers.Dense(self.max_actions, name='prediction_q_target')(dense_1_1_target)
+        out_put_target = tf.keras.layers.Dense(self.max_actions, activation='softmax', name='prediction_q_target')(dense_1_1_target)
+        self.q_target = tf.keras.Model(inputs=input_features_target, outputs=out_put_target)
+
+        self.q_target.set_weights(self.q_pred.get_weights())
+
+    def net_init_LSTM(self):
+        # q_pred
+        input_features = tf.keras.layers.Input(shape=(None, self.n_features), name='input_features')
+        lstm_1 = tf.keras.layers.LSTM(30)(input_features)
+        dense_1 = tf.keras.layers.Dense(256, activation='relu')(lstm_1)
+        out_put = tf.keras.layers.Dense(self.max_actions, name='prediction_q_pred')(dense_1)
+        self.q_pred = tf.keras.Model(inputs=input_features, outputs=out_put)
+
+        # q_target
+        input_features_target = tf.keras.layers.Input(shape=(None, self.n_features), name='input_features_target')
+        lstm_1_target = tf.keras.layers.LSTM(30)(input_features_target)
+        dense_1_target = tf.keras.layers.Dense(256, activation='relu')(lstm_1_target)
+        out_put_target = tf.keras.layers.Dense(self.max_actions, name='prediction_q_pred')(dense_1_target)
         self.q_target = tf.keras.Model(inputs=input_features_target, outputs=out_put_target)
 
         self.q_target.set_weights(self.q_pred.get_weights())
