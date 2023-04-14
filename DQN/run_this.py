@@ -1,5 +1,5 @@
 import numpy as np
-
+from padding import padding_data
 from Qnetwork import DQnetwork
 from calStep import StepCal
 from read_nodeSet import readNodeSet
@@ -34,6 +34,7 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
                           learning_rate=ALPHA, gamma=GAMMA, replace_time=REPLACE_TIME,
                           n_experience_pool=EXPERIENCE_POOL)
     StepCalculater = StepCal(node_num)
+    StepCalculater.service_data = padding_data(max_actions, StepCalculater.service_data)
     DQN_agent.net_init_LSTM()
     max_reward = 0
     for episode in range(MAX_EPISODES):
