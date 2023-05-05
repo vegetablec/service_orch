@@ -8,17 +8,17 @@ import matplotlib.pyplot as plt
 
 
 # 超参数配置
-nodeSet = "./nodeSet.txt"
+nodeSet = "./nodeSet_1.txt"
 outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
-MAX_EPISODES = 1000  # 最大迭代轮数
+MAX_EPISODES = 2500  # 最大迭代轮数
 EXPERIENCE_POOL = 500 # 经验池大小
 BATCH_SIZE = 64 # batch_size
 REPLACE_TIME=300 # replace_time
 y = []
-x = np.arange(0,MAX_EPISODES)
+x = []
 env = []
 def get_env(services_data):
     for i in range(10):
@@ -55,7 +55,6 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
             if done:
                 # print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
                 #       (choosen_actions, reward, time.time() - start, episode))
-                y.append(reward)
                 if episode == 0:
                     max_reward = reward
                 else:
@@ -67,6 +66,9 @@ def DQN_run(max_actions, n_actions, n_features, node_num):
                     else:
                         if episode % 100 == 0:
                             print("episode = {0}, reward = {1}, services = {2}".format(episode, reward, choosen_actions))
+                        #if episode % 500 == 0:
+                            y.append(reward)
+                            x.append(episode)
 
                 break
 
@@ -82,8 +84,7 @@ if __name__ == "__main__":
     print("4.最大候选子集个数：{}".format(max_services_num))
 
     DQN_run(max_services_num, each_services_nums, 1, nodes_num)
-    x = np.array(x)
-    plt.scatter(x, y)
+    plt.plot(x, y, c='r')
     plt.show()
 
 

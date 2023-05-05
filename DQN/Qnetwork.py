@@ -41,7 +41,7 @@ class DQnetwork:
 
 
         if rand < self.epsilon:
-            self.epsilon = self.epsilon * 0.99999
+            self.epsilon = self.epsilon * 0.999
             # return np.random.randint(0, self.max_actions)
             return np.random.randint(0, self.n_actions[state[0]])
 
