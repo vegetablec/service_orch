@@ -30,6 +30,8 @@ class DQnetwork:
         self.replace_time = replace_time
         self.now_learn_time = 0
 
+        self.e_greedy = 1e-4
+
     def loss_f(self, y_true, y_pred):
         return keras.losses.mse(y_true, y_pred)
 
@@ -41,11 +43,11 @@ class DQnetwork:
 
 
         if rand < self.epsilon:
-            self.epsilon = self.epsilon * 0.999
             # return np.random.randint(0, self.max_actions)
             return np.random.randint(0, self.n_actions[state[0]])
 
         else:
+            self.epsilon = max(0.001, self.epsilon - self.e_greedy)
             action_value = self.q_pred.predict(np.array(s))
             return np.argmax(action_value)
             # return np.argmax(action_value[:, 0:(self.n_actions[state[0]])])

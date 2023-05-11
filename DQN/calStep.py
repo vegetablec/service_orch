@@ -116,9 +116,8 @@ class StepCal:
         f1 = ((r[1] - minTime) / (maxTime - minTime))+ \
             ((maxAvail - r[2]) / (maxAvail - minAvail))+ \
             ((maxThrou - r[3]) / (maxThrou - minThrou))+ \
-            ((maxSucc - r[4]) / (maxSucc - minSucc))+ \
-            ((maxReli - r[5]) / (maxReli - minReli))
-        f = 1.0 / 5 * f1
+            ((maxSucc - r[4]) / (maxSucc - minSucc))
+        f = 1.0 / 4 * f1
         return f
 
     def step(self, s, actions):  # 根据选择行为计算reward
@@ -134,12 +133,12 @@ class StepCal:
                     f = -1
                     break
                 f += self.receive(state, actions[state])  # 传state和action
-            reward = f
+            reward = self.receive(s, actions[s])
         # 此状态不为终状态
         else:
             done = False
             s_ = s + 1
-            reward = 0
+            reward = self.receive(s, actions[s])
 
         return s_, reward, done
 
