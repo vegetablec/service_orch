@@ -1,8 +1,9 @@
-import numpy as np
+import csv
 
+import numpy as np
+from calStep import StepCal
 from RL_brain import QLearningTable
 from read_nodeSet import readNodeSet
-from getscore import get_id_list
 import time
 import matplotlib.pyplot as plt
 
@@ -13,33 +14,52 @@ outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
-MAX_EPISODES = 15000  # 最大迭代轮数
+MAX_EPISODES = 8000  # 最大迭代轮数
 ERROR_COUNT = 100   # 连续100次，reward变化在误差允许范围内，则提前终止实验
 ERROR_RANGE = 0.00001   # 误差范围
 judge_list = []
 y = []
 x = []
+changeflag = True
+changerate = 0.05
+
+def changeData(services, rate):
+    for i in range(len(services)):
+        for j in range(len(services[i])):
+            if np.random.rand() < rate:
+                services[i][j][0] *= np.random.uniform(low=0.8, high=2)
+                services[i][j][1] *= np.random.uniform(low=0.5, high=1.2)
+                services[i][j][2] *= np.random.uniform(low=0.5, high=1.2)
+                services[i][j][3] *= np.random.uniform(low=0.8, high=2)
+    print('已改变{}%的数据'.format(rate*100))
+    return services
 
 
-def update():
+def update(nodes_num, each_services_nums, max_services_num):
     start = time.time()
     RL = QLearningTable(n_states=nodes_num, each_services_nums=each_services_nums,
                         max_services_num=max_services_num,
                         learning_rate=ALPHA, reward_decay=GAMMA, e_greedy=EPSILON)
+    StepCalculater = StepCal(nodes_num, each_services_nums)
+    StepCalculater.getMaxandMin()
     max_reward = 0
 
     for episode in range(MAX_EPISODES):
+        if changeflag and episode==2500:
+            StepCalculater.service_data = changeData(StepCalculater.service_data, changerate)
+            #StepCalculater.getMaxandMin()
         # 初始化状态
         state = 0
         # print("episode = {}".format(episode))
-
+        total_reward = 0
+        choosen_actions = []
         while True:
             # 选择行为
             action = RL.choose_action(state)
-
+            choosen_actions.append(action)
             # 进行选择并计算奖励
-            state_, reward, done = RL.step(state, action)
-
+            state_, reward, done = StepCalculater.step(state, choosen_actions)
+            total_reward += reward
             # print("s = {0}, a = {1}, s_ = {2}, reward = {3}, done = {4}".format(
             #     state, action, state_, reward, done
             # ))
@@ -55,26 +75,26 @@ def update():
                 # print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
                 #       (RL.choose_services, reward, time.time()-start, episode))
                 if episode == 0:
-                    max_reward = reward
+                    max_reward = total_reward
                     print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
-                          (RL.choose_services, reward, time.time() - start, episode))
+                          (RL.choose_services, total_reward, time.time() - start, episode))
                 else:
-                    if reward > max_reward:
-                        max_reward = reward
+                    if total_reward > max_reward:
+                        max_reward = total_reward
                         print("services = {0}, reward = {1}, runtime = {2}, episode = {3} ".format
-                              (RL.choose_services, reward, time.time() - start, episode))
+                              (RL.choose_services, total_reward, time.time() - start, episode))
                     else:
                         if episode % 100 == 0:
-                            print("episode = {0}, reward = {1}, epsilon = {2}".format(episode, reward, RL.epsilon))
-                        if episode % 500 == 0:
-                            y.append(reward)
+                            print("episode = {0}, reward = {1}, epsilon = {2}".format(episode, total_reward, RL.epsilon))
+                        if episode % 10 == 0:
+                            y.append(total_reward)
                             x.append(episode)
                 break
 
         # 终止条件
         if episode >= ERROR_COUNT:
             del judge_list[0]
-        judge_list.append(reward)
+        judge_list.append(total_reward)
 
         # if episode >= 1000 and episode % ERROR_COUNT == 0:
         #     if max(judge_list) - min(judge_list) <= ERROR_RANGE:
@@ -104,6 +124,12 @@ if __name__ == "__main__":
     print("3.总的候选原子个数：{}".format(all_services_nums))
     print("4.最大候选子集个数：{}".format(max_services_num))
 
-    update()
+    update(nodes_num, each_services_nums,max_services_num)
     plt.plot(x, y, c='r')
     plt.show()
+    with open('A_QLearning_5%.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        header = ['episode', 'reward']
+        writer.writerow(header)
+        for i in range(len(x)):
+            writer.writerow([x[i], y[i]])

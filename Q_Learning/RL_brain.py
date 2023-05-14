@@ -1,21 +1,18 @@
 import numpy as np
 import pandas as pd
 
-from Q_Learning.getscore import receive
-
 
 class QLearningTable:
     def __init__(self, n_states, each_services_nums, max_services_num, learning_rate, reward_decay,
-                 e_greedy, e_greedy_increment=0.00001):
+                 e_greedy, e_greedy_increment=2e-5):
         self.each_services_nums = each_services_nums
         self.n_actions = max_services_num
         self.n_states = n_states
         self.lr = learning_rate
         self.gamma = reward_decay
         self.choose_services = [0 for i in range(self.n_states)]
-        self.epsilon_max = e_greedy
+        self.epsilon = e_greedy
         self.epsilon_increment = e_greedy_increment
-        self.epsilon = 0 if e_greedy_increment is not None else self.epsilon_max
 
         # 生成Q表，无效部分为NaN
         services_tmp_list = [[0] * self.each_services_nums[i] for i in range(len(each_services_nums))]
@@ -26,12 +23,13 @@ class QLearningTable:
     def choose_action(self, state):  # 选择动作
         state_action = self.q_table.loc[state, :self.each_services_nums[state]]  # 取Q表中有效部分切片
         # 选择随机行为
-        if (np.random.rand() > self.epsilon) or ((state_action == 0).all()):
+        if (np.random.rand() < self.epsilon) or ((state_action == 0).all()):
             # print(self.epsilon)
             action = np.random.choice(list(range(self.each_services_nums[state])))
 
         # 选择最大价值行为，相同价值行为随机选择
         else:
+            self.epsilon = max(0.001, self.epsilon - self.epsilon_increment)
             action = np.random.choice(state_action[state_action == np.max(state_action)].index)
         self.choose_services[state] = action
         return action
@@ -46,22 +44,3 @@ class QLearningTable:
             q_target = r
         self.q_table.loc[s, a] += self.lr * (q_target - q_predict)
 
-        self.epsilon = self.epsilon + self.epsilon_increment if self.epsilon < self.epsilon_max else self.epsilon_max
-
-    def step(self, s, a):  # 根据选择行为计算reward
-        # 此状态为终状态
-        if s == self.n_states - 1:
-            done = True
-            s_ = -1
-            f = 0
-            # 计算Qos评分
-            for i in range(len(self.choose_services)):
-                f += receive(i, self.choose_services[i])  # 传state和action
-            reward = f
-        # 此状态不为终状态
-        else:
-            done = False
-            s_ = s + 1
-            reward = 0
-
-        return s_, reward, done

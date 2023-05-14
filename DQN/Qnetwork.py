@@ -30,7 +30,7 @@ class DQnetwork:
         self.replace_time = replace_time
         self.now_learn_time = 0
 
-        self.e_greedy = 1e-4
+        self.e_greedy = 2e-5
 
     def loss_f(self, y_true, y_pred):
         return keras.losses.mse(y_true, y_pred)
@@ -57,7 +57,7 @@ class DQnetwork:
         input_features = tf.keras.Input(shape=(self.n_features), name='input_features')
         dense_0 = tf.keras.layers.Dense(32, activation='relu')(input_features)
         dense_1 = tf.keras.layers.Dense(64, activation='relu')(dense_0)
-        dense_1_2 =  tf.keras.layers.Dense(128, activation='relu')(dense_1)
+        dense_1_2 = tf.keras.layers.Dense(128, activation='relu')(dense_1)
         dense_1_1 = tf.keras.layers.Dense(256, activation='relu')(dense_1_2)
         out_put = tf.keras.layers.Dense(self.max_actions, activation='softmax', name='prediction_q_pred')(dense_1_1)
         self.q_pred = tf.keras.Model(inputs=input_features, outputs=out_put)
