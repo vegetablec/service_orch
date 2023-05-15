@@ -10,14 +10,10 @@ import matplotlib.pyplot as plt
 
 # 超参数配置
 nodeSet = "./nodeSet_1.txt"
-outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.2  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
 MAX_EPISODES = 8000  # 最大迭代轮数
-ERROR_COUNT = 100   # 连续100次，reward变化在误差允许范围内，则提前终止实验
-ERROR_RANGE = 0.00001   # 误差范围
-judge_list = []
 y = []
 x = []
 changeflag = True
@@ -91,27 +87,6 @@ def update(nodes_num, each_services_nums, max_services_num):
                             x.append(episode)
                 break
 
-        # 终止条件
-        if episode >= ERROR_COUNT:
-            del judge_list[0]
-        judge_list.append(total_reward)
-
-        # if episode >= 1000 and episode % ERROR_COUNT == 0:
-        #     if max(judge_list) - min(judge_list) <= ERROR_RANGE:
-        #         output = "\n  达到收敛条件，提前终止实验！\n"
-        #         # line = [x for x in RL.choose_services]
-        #         # line.append(reward)
-        #         # line.append(time.time() - start)
-        #         # line.append(episode)
-        #         # 打印收敛结果
-        #         # print(output)
-        #         # print(line)
-        #         # 记录收敛结果
-        #         # fp = open(outfile, 'a+')
-        #         # fp.write(output)
-        #         # fp.write(str(line) + '\n')
-        #         # fp.close()
-        #         break
 
     print("game over, runtime ={} ".format(time.time() - start))
 

@@ -12,7 +12,6 @@ plt.rcParams['font.sans-serif']=['SimHei']
 
 # 超参数配置
 nodeSet = "./nodeSet_1.txt"
-outfile = "save/qlearning_10_1_1.txt"
 ALPHA = 0.01  # learning rate
 GAMMA = 0.9    # reward_decay
 EPSILON = 0.9  # e_greedy
