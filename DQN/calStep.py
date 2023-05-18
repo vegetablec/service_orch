@@ -106,7 +106,7 @@ class StepCal:
         r = self.service_data[state][action]
         f1 = ((self.maxTime - r[0]) / (self.maxTime - self.minTime))+ \
             ((r[1] - self.minAvail) / (self.maxAvail - self.minAvail))+ \
-            ((r[2] - self.minAvail) / (self.maxThrou - self.minThrou))+ \
+            ((r[2] - self.minThrou) / (self.maxThrou - self.minThrou))+ \
             ((self.maxLate - r[3]) / (self.maxLate - self.minLate))
         f = 1.0 / 4 * f1
         return f

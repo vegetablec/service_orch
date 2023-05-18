@@ -49,7 +49,7 @@ def getMinThr():
 
 def createdata(maxRT, minRT, maxAvai, minAvai, maxThr, minThr):
     RT = np.random.uniform(low=(np.random.uniform(low=minRT * 0.7, high=minRT * 1.1)), high=(np.random.uniform(low=maxRT * 0.7, high=maxRT * 1.1)))
-    Avai = np.random.uniform(low=(np.random.uniform(low=minAvai * 0.7, high=minAvai * 1.1)), high=(np.random.uniform(low=maxAvai * 0.7, high=maxAvai * 1.1)))
+    Avai = np.random.uniform(low=(np.random.uniform(low=minAvai * 0.7, high=minAvai * 1.1)), high=(np.random.uniform(low=maxAvai * 0.7, high=maxAvai * 1)))
     Thr = np.random.uniform(low=(np.random.uniform(low=minThr * 0.7, high=minThr * 1.1)), high=(np.random.uniform(low=maxThr * 0.7, high=maxThr * 1.1)))
     return [round(RT, 1), round(Avai, 1), round(Thr, 1)]
 
@@ -65,7 +65,7 @@ def getpalanddel():
     elif place==3:
         delay = np.random.randint(10, 700)
 
-    return delay, place
+    return 0, place
 
 if __name__=='__main__':
     maxRT = getMaxRT()
@@ -76,9 +76,9 @@ if __name__=='__main__':
     minThr = getMinThr()
     print(maxRT, minRT, maxAvai, minAvai, maxThr, minThr)
     alldata = []
-    for i in range(2507):
-        alldata.append(list(data[i]))
-    for i in range(7493):
+    # for i in range(2507):
+    #     alldata.append(list(data[i]))
+    for _ in range(20000):
         randata = createdata(maxRT, minRT, maxAvai, minAvai, maxThr, minThr)
         alldata.append(randata)
     for data in alldata:
@@ -87,7 +87,7 @@ if __name__=='__main__':
         data.append(place)
     random.shuffle(alldata)
     print(alldata)
-    with open('data.csv', 'w', newline='') as file:
+    with open('traindata.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         header = ['RT', 'Avai', 'Thr', 'Late', 'Place']
         writer.writerow(header)
